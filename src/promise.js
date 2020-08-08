@@ -13,12 +13,18 @@ function MyPromise(executor) {
         if (this.status === "pending") {
             this.status = "fulfilled";
             this.data = data;
+            this.successCallback.forEach(fn => {
+                fn(data);
+            });
         }
     }
     const reject = (error) => {
         if (this.status === "pending") {
             this.status = "rejected";
             this.error = error;
+            this.failCallback.forEach(fn => {
+                fn(error);
+            });
         }
     }
     try {
@@ -35,7 +41,10 @@ MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error
     } else if (this.status === "rejected") {
         failFn(this.error);
     } else if (this.status === "pending") {
-
+        // 如果当前promise处于等待状态，由于无法判断执行失败或是成功回调
+        // 需要先将两个回调放入到promise的回调数组中，在resolve或者reject时执行
+        this.successCallback.push(successFn);
+        this.failCallback.push(failFn);
     }
 };
 
