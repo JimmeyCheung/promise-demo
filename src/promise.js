@@ -12,7 +12,7 @@ function MyPromise(executor) {
     const resolve = (data) => {
         if (this.status === "pending") {
             this.status = "fulfilled";
-            this.data = data;
+            this.value = data;
             this.successCallback.forEach(fn => {
                 fn(data);
             });
@@ -34,7 +34,7 @@ function MyPromise(executor) {
     }
 }
 
-// 实现Promise的then方法
+// 实现Promise的then方法，支持链式操作
 MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error) => { }) {
     const self = this;
     if (this.status === "fulfilled") {
@@ -61,7 +61,7 @@ MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error
         return new MyPromise((resolve, reject) => {
             self.successCallback.push(function () {
                 try {
-                    const x = successFn(self.data);
+                    const x = successFn(self.value);
                     resolve(x);
                 } catch (err) {
                     reject(err);
@@ -78,5 +78,31 @@ MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error
         })
     }
 };
+
+// 实现Promise.all方法，对MyPromise传入一个数组
+// 只有当数组中所有的promise对象都fulfilled或则出现一个promise对象rejected时返回结果
+MyPromise.all = function (arr = []) {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(arr)) {
+            throw new Error(`argument must be a array`)
+        }
+        let doneCount = 0;
+        let result = [];
+        for (let i = 0; i < arr.length; i++) {
+            let p = arr[i];
+            if (typeof p.then === 'function') {
+                p.then(value => {
+                    doneCount++;
+                    result.push(value)
+                    if (doneCount === arr.length) {
+                        return resolve(result);
+                    }
+                }, err => {
+                    return reject(err);
+                })
+            }
+        }
+    })
+}
 
 export default MyPromise;

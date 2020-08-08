@@ -1,24 +1,16 @@
 import MyPromise from "./promise.js";
 
-const resolvePromise = new MyPromise((resolve, reject) => {
-    setTimeout(() => {
-        resolve('成功');
-    }, 2000)
-}).then((value) => {
-    return value
+
+const p1 = new MyPromise((resolve, reject) => {
+    setTimeout(() => { resolve(1) }, 1000)
 })
-
-const rejectPromise = new MyPromise((resolve, reject) => {
-    reject('失败');
-}).then((value) => {
-}, (error) => {
-    return error
+const p2 = new MyPromise((resolve, reject) => {
+    resolve(2)
 })
-
-resolvePromise.then((value) => { print(`resolve:${value}`) }, (err) => { print(`reject:${err}`) })
-
-rejectPromise.then((value) => { print(`resolve:${value}`) }, (err) => { print(`reject:${err}`) })
-
+const p3 = new MyPromise((resolve, reject) => {
+    resolve(3)
+})
+MyPromise.all([p1, p2, p3]).then((v) => { print(`resolve:${v.join(",")}`) }, (e) => { print(`reject:${e}`) })
 
 
 function print(value) {
