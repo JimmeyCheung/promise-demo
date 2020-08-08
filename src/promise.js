@@ -36,15 +36,46 @@ function MyPromise(executor) {
 
 // 实现Promise的then方法
 MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error) => { }) {
+    const self = this;
     if (this.status === "fulfilled") {
-        successFn(this.value);
+        return new MyPromise((resolve, reject) => {
+            try {
+                const x = successFn(self.value);
+                resolve(x);
+            } catch (err) {
+                reject(err);
+            }
+        })
     } else if (this.status === "rejected") {
-        failFn(this.error);
+        return new MyPromise((resolve, reject) => {
+            try {
+                const x = failFn(self.error);
+                reject(x);
+            } catch (err) {
+                reject(err);
+            }
+        })
     } else if (this.status === "pending") {
         // 如果当前promise处于等待状态，由于无法判断执行失败或是成功回调
         // 需要先将两个回调放入到promise的回调数组中，在resolve或者reject时执行
-        this.successCallback.push(successFn);
-        this.failCallback.push(failFn);
+        return new MyPromise((resolve, reject) => {
+            self.successCallback.push(function () {
+                try {
+                    const x = successFn(self.data);
+                    resolve(x);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+            self.failCallback.push(function () {
+                try {
+                    const x = failFn(self.error);
+                    reject(x);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        })
     }
 };
 

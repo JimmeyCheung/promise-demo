@@ -1,22 +1,26 @@
 import MyPromise from "./promise.js";
 
-new MyPromise((resolve, reject) => {
+const resolvePromise = new MyPromise((resolve, reject) => {
     setTimeout(() => {
         resolve('成功');
     }, 2000)
 }).then((value) => {
-    print(`resolve:${value}`);
+    return value
 })
 
-// new MyPromise((resolve, reject) => {
-//     reject('异步操作执行完成');
-// }).then((value) => {
-//     print(`resolve:${value}`);
-// }, (error) => {
-//     print(`reject:${error}`);
-// })
+const rejectPromise = new MyPromise((resolve, reject) => {
+    reject('失败');
+}).then((value) => {
+}, (error) => {
+    return error
+})
+
+resolvePromise.then((value) => { print(`resolve:${value}`) }, (err) => { print(`reject:${err}`) })
+
+rejectPromise.then((value) => { print(`resolve:${value}`) }, (err) => { print(`reject:${err}`) })
+
 
 
 function print(value) {
-    document.querySelector("#output").innerHTML = value;
+    document.querySelector("#output").innerHTML += `<p>${value}</p>`;
 }
