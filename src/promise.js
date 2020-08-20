@@ -33,9 +33,21 @@ function MyPromise(executor) {
         reject(err);
     }
 }
+// 实现Promise的resolve方法
+MyPromise.resolve = function (value) {
+    return new MyPromise(resolve => {
+        resolve(value);
+    })
+}
+// 实现Promise的resolve方法
+MyPromise.reject = function (value) {
+    return new MyPromise((resolve, reject) => {
+        reject(value);
+    })
+}
 
 // 实现Promise的then方法，支持链式操作
-MyPromise.prototype.then = function (successFn = (value) => { }, failFn = (error) => { }) {
+MyPromise.prototype.then = function (successFn = (value) => {}, failFn = (error) => {}) {
     const self = this;
     if (this.status === "fulfilled") {
         return new MyPromise((resolve, reject) => {

@@ -16,3 +16,5 @@ MyPromise.all([p1, p2, p3]).then((v) => { print(`resolve:${v.join(",")}`) }, (e)
 function print(value) {
     document.querySelector("#output").innerHTML += `<p>${value}</p>`;
 }
+MyPromise.resolve("成功").then(v => print(v));
+MyPromise.resolve("失败").then(v => print(v));
