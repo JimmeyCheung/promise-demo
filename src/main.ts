@@ -18,3 +18,6 @@ function print(value) {
 }
 MyPromise.resolve("成功").then(v => print(v));
 MyPromise.resolve("失败").then(v => print(v));
+
+MyPromise.race([MyPromise.resolve("成功"), MyPromise.reject("失败")]).then(v => print(v), err => print(err))
+MyPromise.race([MyPromise.reject("失败"), MyPromise.resolve("成功")]).then(v => print(v), err => print(err))

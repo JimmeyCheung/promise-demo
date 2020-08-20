@@ -96,7 +96,7 @@ MyPromise.prototype.then = function (successFn = (value) => {}, failFn = (error)
 MyPromise.all = function (arr = []) {
     return new Promise((resolve, reject) => {
         if (!Array.isArray(arr)) {
-            throw new Error(`argument must be a array`)
+            reject('argument must be a array');
         }
         let doneCount = 0;
         let result = [];
@@ -112,6 +112,29 @@ MyPromise.all = function (arr = []) {
                 }, err => {
                     return reject(err);
                 })
+            } else {
+                reject('the item of array is not a promise');
+            }
+        }
+    })
+}
+// 实现Promise.ract方法，对MyPromise传入一个数组
+// 以最先执行完毕或失败的promise结果为准,由于resolve和reject只对状态为pendding时有效，因此正常遍历执行每一个promise即可
+MyPromise.race = function (arr = []) {
+    return new MyPromise((resolve, reject) => {
+        if (!Array.isArray(arr)) {
+            throw new Error(`argument must be a array`)
+        }
+        for (let i = 0; i < arr.length; i++) {
+            let p = arr[i];
+            if (typeof p.then === 'function') {
+                p.then(value => {
+                    resolve(value);
+                }, error => {
+                    reject(error);
+                })
+            } else {
+                reject('the item of array is not a promise');
             }
         }
     })
